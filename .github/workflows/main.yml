@@ -40,6 +40,7 @@ jobs:
           sudo make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
             install modules_install INSTALL_PATH=../${{ env.TARGET_PATH }}/boot \
             INSTALL_MOD_PATH=../${{ env.TARGET_PATH }}
+          sudo rm ../${{ env.TARGET_PATH }}/lib/modules/*/{build,source}
 
       - name: Package the built kernel
         working-directory: ${{ env.TARGET_PATH }}
