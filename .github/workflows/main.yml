@@ -10,7 +10,7 @@ jobs:
     env:
       KERNEL_VER: 'v5.18.14'
       LINUX_PATH: 'linux'
-      TARGET_PATH: 'kernel'
+      TARGET_PATH: 'kernel_aarch64'
 
     steps:
       - name: Checkout
@@ -47,7 +47,21 @@ jobs:
           tar zcf ../kernel-aarch64.tar.gz *
 
       - name: Upload compressed kernel
+        if: startsWith(github.ref, 'refs/tags/') == false
         uses: actions/upload-artifact@v2
         with:
           name: kernel-aarch64.tar.gz
           path: kernel-aarch64.tar.gz
+
+      - name: Calculate hash
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          sha512sum kernel-aarch64.tar.gz > sha512.sum
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            kernel-aarch64.tar.gz
+            sha512.sum
