@@ -22,8 +22,11 @@ jobs:
           ref: ${{ env.KERNEL_VER }}
           path: ${{ env.LINUX_PATH }}
 
+      - name: Prepare build config
+        run: |
+          cp aarch64.config ${{ env.LINUX_PATH }}/.config
+
       - name: Build the kernel
         working-directory: ${{ env.LINUX_PATH }}
         run: |
-          ls -l
-          git show
+          ls -al
