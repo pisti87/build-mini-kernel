@@ -29,4 +29,4 @@ jobs:
       - name: Build the kernel
         working-directory: ${{ env.LINUX_PATH }}
         run: |
-          ls -al
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j4
