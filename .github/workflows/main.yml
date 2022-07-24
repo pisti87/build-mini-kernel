@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      KERNEL_VER: 'v5.18.14'
+      LINUX_PATH: 'linux'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Checkout Linux stable kernel
+        uses: actions/checkout@v3
+        with:
+          repository: gregkh/linux
+          ref: ${{ env.KERNEL_VER }}
+          path: ${{ env.LINUX_PATH }}
+
+      - name: Build the kernel
+        working-directory: ${{ env.LINUX_PATH }}
+        run: |
+          ls -l
+          git show
