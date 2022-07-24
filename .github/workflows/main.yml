@@ -22,11 +22,15 @@ jobs:
           ref: ${{ env.KERNEL_VER }}
           path: ${{ env.LINUX_PATH }}
 
-      - name: Prepare build config
+      - name: Prepare build environment
         run: |
+          sudo apt update -y
+          sudo apt install gcc-aarch64-linux-gnu -y
+
+          # gcc-aarch64-linux-gnu
           cp aarch64.config ${{ env.LINUX_PATH }}/.config
 
       - name: Build the kernel
         working-directory: ${{ env.LINUX_PATH }}
         run: |
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j4
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j8
