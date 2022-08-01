@@ -31,7 +31,7 @@ jobs:
           # gcc-aarch64-linux-gnu
           cp aarch64.config ${{ env.LINUX_PATH }}/.config
 
-          mkdir -p ${{ env.TARGET_PATH }}/boot
+          sudo mkdir -p ${{ env.TARGET_PATH }}/boot
 
       - name: Build and install the kernel
         working-directory: ${{ env.LINUX_PATH }}
@@ -45,7 +45,8 @@ jobs:
       - name: Package the built kernel
         working-directory: ${{ env.TARGET_PATH }}
         run: |
-          tar zcf ../kernel-aarch64.tar.gz *
+          sudo tar zcf ../kernel-aarch64.tar.gz *
+          sudo chmod a+r ../kernel-aarch64.tar.gz
 
       - name: Upload compressed kernel
         if: startsWith(github.ref, 'refs/tags/') == false
