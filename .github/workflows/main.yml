@@ -38,7 +38,8 @@ jobs:
         run: |
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j8
           sudo make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
-            install modules_install INSTALL_PATH=../${{ env.TARGET_PATH }}/boot \
+            install dtbs_install modules_install \
+            INSTALL_PATH=../${{ env.TARGET_PATH }}/boot \
             INSTALL_MOD_PATH=../${{ env.TARGET_PATH }}
           sudo rm ../${{ env.TARGET_PATH }}/lib/modules/*/{build,source}
 
