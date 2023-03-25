@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      KERNEL_VER: 'v6.1.8'
+      KERNEL_VER: 'v6.2.8'
       LINUX_PATH: 'linux'
       TARGET_PATH: 'kernel_aarch64'
 
