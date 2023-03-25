@@ -7,10 +7,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [aarch64, riscv64]
     env:
       KERNEL_VER: 'v6.2.8'
       LINUX_PATH: 'linux'
-      TARGET_PATH: 'kernel_aarch64'
+      TARGET_PATH: 'kernel_${{ matrix.arch }}'
 
     steps:
       - name: Checkout
@@ -26,18 +29,23 @@ jobs:
       - name: Prepare build environment
         run: |
           sudo apt update -y
-          sudo apt install gcc-aarch64-linux-gnu -y
+          sudo apt install gcc-${{ matrix.arch }}-linux-gnu -y
 
-          # gcc-aarch64-linux-gnu
-          cp aarch64.config ${{ env.LINUX_PATH }}/.config
+          # gcc-{matrix.arch}-linux-gnu
+          cp ${{ matrix.arch }}.config ${{ env.LINUX_PATH }}/.config
 
           sudo mkdir -p ${{ env.TARGET_PATH }}/boot
 
       - name: Build and install the kernel
         working-directory: ${{ env.LINUX_PATH }}
         run: |
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j8
-          sudo make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
+          case "${{ matrix.arch }}" in
+            aarch64) arch='arm64' ;;
+            riscv64) arch='riscv' ;;
+          esac
+
+          make ARCH=${arch} CROSS_COMPILE=${{ matrix.arch }}-linux-gnu- -j8
+          sudo make ARCH=${arch} CROSS_COMPILE=${{ matrix.arch }}-linux-gnu- \
             install dtbs_install modules_install \
             INSTALL_PATH=../${{ env.TARGET_PATH }}/boot \
             INSTALL_MOD_PATH=../${{ env.TARGET_PATH }}
@@ -46,25 +54,25 @@ jobs:
       - name: Package the built kernel
         working-directory: ${{ env.TARGET_PATH }}
         run: |
-          sudo tar zcf ../kernel-aarch64.tar.gz *
-          sudo chmod a+r ../kernel-aarch64.tar.gz
+          sudo tar zcf ../kernel-${{ matrix.arch }}.tar.gz *
+          sudo chmod a+r ../kernel-${{ matrix.arch }}.tar.gz
 
       - name: Upload compressed kernel
         if: startsWith(github.ref, 'refs/tags/') == false
         uses: actions/upload-artifact@v3
         with:
-          name: kernel-aarch64.tar.gz
-          path: kernel-aarch64.tar.gz
+          name: kernel-${{ matrix.arch }}.tar.gz
+          path: kernel-${{ matrix.arch }}.tar.gz
 
       - name: Calculate hash
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          sha512sum kernel-aarch64.tar.gz > sha512.sum
+          sha512sum kernel-${{ matrix.arch }}.tar.gz > ${{ matrix.arch }}.sha512.sum
 
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            kernel-aarch64.tar.gz
-            sha512.sum
+            kernel-${{ matrix.arch }}.tar.gz
+            ${{ matrix.arch }}.sha512.sum
