@@ -11,7 +11,7 @@ jobs:
       matrix:
         arch: [aarch64, riscv64]
     env:
-      KERNEL_VER: 'v6.2.8'
+      KERNEL_VER: 'v6.3.1'
       LINUX_PATH: 'linux'
       TARGET_PATH: 'kernel_${{ matrix.arch }}'
 
