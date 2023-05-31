@@ -12,13 +12,19 @@ jobs:
         arch: [aarch64, riscv64]
     env:
       KERNEL_REPO: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
-      KERNEL_VER: 'v6.3.1'
       LINUX_PATH: 'linux'
       TARGET_PATH: 'kernel_${{ matrix.arch }}'
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Get kernel version to build
+        shell: bash
+        run: |
+          ver_str=$(cat version)
+          IFS='-' read -a ver_str_arr <<< $ver_str
+          echo "KERNEL_VER=${ver_str_arr[0]}" >> $GITHUB_ENV
 
       - name: Checkout Linux stable kernel
         run: |
