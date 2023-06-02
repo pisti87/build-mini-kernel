@@ -80,3 +80,25 @@ jobs:
           files: |
             kernel-${{ matrix.arch }}.tar.gz
             ${{ matrix.arch }}.sha512.sum
+
+  trigger-image:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get build version
+        shell: bash
+        run: |
+          echo "KERNEL_BUILD=$(cat version)" >> $GITHUB_ENV
+
+      - name: Trigger building image
+        run: |
+          curl -H "Accept: application/vnd.github.everest-preview+json" \
+               -H "Authorization: token ${{ secrets.BUILD_IMAGE_TOKEN }}" \
+               --request POST \
+               --data '{"event_type": "bump-kernel", "client_payload": { "KERNEL_VERSION": "${{ env.KERNEL_BUILD }}"}}' \
+               https://api.github.com/repos/starnight/build-image/dispatches
