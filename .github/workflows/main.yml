@@ -80,6 +80,7 @@ jobs:
           files: |
             kernel-${{ matrix.arch }}.tar.gz
             ${{ matrix.arch }}.sha512.sum
+          generate_release_notes: true
 
   trigger-image:
     runs-on: ubuntu-latest
