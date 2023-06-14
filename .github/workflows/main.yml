@@ -97,9 +97,15 @@ jobs:
           echo "KERNEL_BUILD=$(cat version)" >> $GITHUB_ENV
 
       - name: Trigger building image
-        run: |
-          curl -H "Accept: application/vnd.github.everest-preview+json" \
-               -H "Authorization: token ${{ secrets.BUILD_IMAGE_TOKEN }}" \
-               --request POST \
-               --data '{"event_type": "bump-kernel", "client_payload": { "KERNEL_VERSION": "${{ env.KERNEL_BUILD }}"}}' \
-               https://api.github.com/repos/starnight/build-image/dispatches
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.BUILD_IMAGE_TOKEN }}
+          script: |
+            await github.rest.repos.createDispatchEvent({
+              owner: "starnight",
+              repo: "build-image",
+              event_type: "bump-kernel",
+              client_payload: {
+                KERNEL_VERSION: "${{ env.KERNEL_BUILD }}",
+              }
+            })
