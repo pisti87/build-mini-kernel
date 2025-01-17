@@ -10,8 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      KERNEL_REPO: https://github.com/pisti87/android_kernel_google_gs201.git
-      LINUX_PATH: 'lineage-21'
+      KERNEL_REPO: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
+      LINUX_PATH: 'linux'
+      TARGET_PATH: 'kernel_${{ matrix.arch }}'
       TARGET_PATH: 'kernel_build'
 
     steps:
