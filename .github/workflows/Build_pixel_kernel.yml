@@ -35,7 +35,7 @@ jobs:
         run: |
          # make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- vendor/pixel-7a_defconfig
          # make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc)
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- gs201_hybrid_defconfig
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
 
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc)
       # 4. Kernel csomagolása
