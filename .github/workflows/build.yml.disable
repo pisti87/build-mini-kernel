@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [aarch64, riscv64]
+        arch: [arm64]
+# [aarch64, riscv64]
     env:
       KERNEL_REPO: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
       LINUX_PATH: 'linux'
