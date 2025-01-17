@@ -13,7 +13,7 @@ jobs:
       KERNEL_REPO: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
       LINUX_PATH: 'linux'
       TARGET_PATH: 'kernel_${{ matrix.arch }}'
-      TARGET_PATH: 'kernel_build'
+      # TARGET_PATH: 'kernel_build'
 
     steps:
       # 1. Forráskód letöltése
