@@ -1,0 +1,83 @@
+name: Pixel 7a Kernel CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      KERNEL_REPO: https://github.com/engstk/pxl7a.git
+      LINUX_PATH: 'pxl7a_kernel'
+      TARGET_PATH: 'kernel_build'
+
+    steps:
+      # 1. Forráskód letöltése
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Clone Pixel 7a kernel source
+        run: |
+          git clone ${{ env.KERNEL_REPO }} ${{ env.LINUX_PATH }}
+
+      # 2. Build környezet előkészítése
+      - name: Prepare build environment
+        run: |
+          sudo apt update -y
+          sudo apt install -y gcc-aarch64-linux-gnu libncurses-dev bison flex libssl-dev bc
+
+      # 3. Kernel fordítása
+      - name: Build the Pixel 7a kernel
+        working-directory: ${{ env.LINUX_PATH }}
+        run: |
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- vendor/pixel-7a_defconfig
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc)
+
+      # 4. Kernel csomagolása
+      - name: Package the built kernel
+        working-directory: ${{ env.LINUX_PATH }}
+        run: |
+          mkdir -p ../${{ env.TARGET_PATH }}
+          cp arch/arm64/boot/Image.gz-dtb ../${{ env.TARGET_PATH }}/
+          tar -czf ../kernel-pxl7a.tar.gz -C ../${{ env.TARGET_PATH }} .
+
+      # 5. Artefaktum feltöltése
+      - name: Upload compressed kernel
+        uses: actions/upload-artifact@v3
+        with:
+          name: kernel-pxl7a.tar.gz
+          path: kernel-pxl7a.tar.gz
+
+  docker-test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      # 1. Checkout repó
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # 2. Build kernel letöltése
+      - name: Download built kernel
+        uses: actions/download-artifact@v3
+        with:
+          name: kernel-pxl7a.tar.gz
+          path: kernel-pxl7a.tar.gz
+
+      # 3. Kicsomagolás
+      - name: Extract kernel
+        run: |
+          mkdir -p kernel
+          tar -xzf kernel-pxl7a.tar.gz -C kernel
+
+      # 4. Docker konténer futtatás
+      - name: Run Docker with kernel
+        run: |
+          docker run --rm \
+            --privileged \
+            -v $(pwd)/kernel:/kernel \
+            ubuntu:22.04 \
+            /bin/bash -c "ls /kernel && uname -a"
