@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [aarch64, riscv64]
+        arch: [aarch64, arm64, riscv64]
     env:
       KERNEL_REPO: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
       LINUX_PATH: 'linux'
@@ -45,6 +45,7 @@ jobs:
         run: |
           case "${{ matrix.arch }}" in
             aarch64) arch='arm64' ;;
+            arm64) arch='arm64' ;;
             riscv64) arch='riscv' ;;
           esac
 
